@@ -36,13 +36,31 @@ public:
 
     void setPreampLevel (int levelDb)
     {
-        preampLevelDb = levelDb;
-        notifyListeners ("preampLevel", preampLevelDb);
-    }
+        //adding check to ensure input preamp level is inside range
 
+        if (levelDb < MINUS_INFINITY_DB || levelDb > UNITY_GAIN_DB){
+            
+            
+        }else{
+            preampLevelDb = levelDb;
+            notifyListeners ("preampLevel", preampLevelDb);
+        }
+        
+    }
+    
     int getPreampLevel () const
     {
         return preampLevelDb;
+    }
+
+    //getters and setters for Phantom Power
+    void setPhantomPower(auto phantomPowerState){
+       phantomPowerStatus = phantomPowerState
+        
+    }
+
+    bool getPhantomPower(){
+        return phantomPowerStatus;
     }
 
     static constexpr int MINUS_INFINITY_DB = -127;
@@ -57,6 +75,12 @@ private:
 
     std::string modelName;
     int preampLevelDb = MINUS_INFINITY_DB;
+    enum PhantomPower{
+        off,
+        on
+    };
+
+    enum PhantomPower phantomPowerStatus;
 
     std::vector<std::shared_ptr<Listener>> listeners;
 };
@@ -139,6 +163,9 @@ void runApp ()
         if (input == "status")
         {
             std::cout << "Preamp level: " << std::to_string (device.getPreampLevel ()) << std::endl;
+
+            //line added here to give status of phantom power now as well
+            std::cout << "Phantom Power: " << std::to_string(device.getPhantomPower()) << std::endl;
         }
         else if (! processDeviceCommand (input, device))
         {
