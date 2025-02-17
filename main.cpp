@@ -36,12 +36,12 @@ public:
 
     void setPreampLevel (int levelDb)
     {
-        //adding check to ensure input preamp level is inside range
-
+        //**************adding check to ensure input preamp level is inside range**************************
         if (levelDb < MINUS_INFINITY_DB || levelDb > UNITY_GAIN_DB){
             
-            
+            std::cout << "Invalid Preamp Level Value" //will probably change this message  
         }else{
+            
             preampLevelDb = levelDb;
             notifyListeners ("preampLevel", preampLevelDb);
         }
@@ -53,7 +53,7 @@ public:
         return preampLevelDb;
     }
 
-    //getters and setters for Phantom Power
+    //**************getters and setters for Phantom Power******************
     void setPhantomPower(auto phantomPowerState){
        phantomPowerStatus = phantomPowerState
         
@@ -164,7 +164,7 @@ void runApp ()
         {
             std::cout << "Preamp level: " << std::to_string (device.getPreampLevel ()) << std::endl;
 
-            //line added here to give status of phantom power now as well
+            //*************line added here to give status of phantom power now as well***********************
             std::cout << "Phantom Power: " << std::to_string(device.getPhantomPower()) << std::endl;
         }
         else if (! processDeviceCommand (input, device))
