@@ -25,6 +25,8 @@
 *[3] Ensuring Preamp level in range*
 - just a simple if, else statement to check - inside setPreampLevel method
 - also added try catch block inside processCommand to ensure non-numerical values for preamp values are handled
+
+
   ![image](https://github.com/user-attachments/assets/b168762c-1a1e-42db-b5aa-865daf31d5ff)
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
