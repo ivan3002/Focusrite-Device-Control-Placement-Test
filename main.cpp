@@ -4,10 +4,16 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include <iostream>
+#include <optional>
+#include <algorithm>
+
+
 
 class Device
 {
 public:
+
     struct Listener
     {
         virtual ~Listener () = default;
@@ -26,7 +32,7 @@ public:
 
     void removeListener (std::shared_ptr<Listener> listener)
     {
-        listeners.erase (std::ranges::remove (listeners, listener).begin (), listeners.end ());
+        listeners.erase (std::ranges::remove(listeners, listener).begin (), listeners.end ());
     }
 
     std::string getModelName () const
@@ -39,7 +45,7 @@ public:
         //**************adding check to ensure input preamp level is inside range**************************
         if (levelDb < MINUS_INFINITY_DB || levelDb > UNITY_GAIN_DB){
             
-            std::cout << "Invalid Preamp Level Value" //will probably change this message  
+            std::cout << "Preamp level must be between -127 and 0";  
         }else{
             
             preampLevelDb = levelDb;
@@ -54,17 +60,24 @@ public:
     }
 
     //**************getters and setters for Phantom Power******************
-    void setPhantomPower(auto phantomPowerState){
-       phantomPowerStatus = phantomPowerState
+    void setPhantomPower(bool phantomPowerState){
         
+       phantomPowerStatus = phantomPowerState;
+       notifyListeners ("phantomPower", phantomPowerState ); 
     }
 
-    bool getPhantomPower(){
-        return phantomPowerStatus;
+    std::string getPhantomPower(){
+        if (phantomPowerStatus == 1){
+            return "on";
+        }else {
+            return "off";
+        }
+       
     }
 
     static constexpr int MINUS_INFINITY_DB = -127;
     static constexpr int UNITY_GAIN_DB = 0;
+    
 
 private:
     void notifyListeners (const std::string & name, const std::variant<int, bool> & value) const
@@ -75,12 +88,9 @@ private:
 
     std::string modelName;
     int preampLevelDb = MINUS_INFINITY_DB;
-    enum PhantomPower{
-        off,
-        on
-    };
+    
 
-    enum PhantomPower phantomPowerStatus;
+    bool phantomPowerStatus;
 
     std::vector<std::shared_ptr<Listener>> listeners;
 };
@@ -111,24 +121,45 @@ public:
 
 std::optional<std::string> findValueString (const std::string & input, const std::string & controlPrefix)
 {
-    if (! input.starts_with (controlPrefix))
+
+    //added braces here?
+    if (! input.starts_with (controlPrefix)){
         return std::nullopt;
+    }else{
+        
+        auto value = input.substr (controlPrefix.length ());
+        value.erase (std::ranges::remove_if(value, isspace).begin (), value.end ());
 
-    auto value = input.substr (controlPrefix.length ());
-    value.erase (std::ranges::remove_if (value, isspace).begin (), value.end ());
-
-    return value;
+        return value;
+    }
 }
 
 bool processDeviceCommand (const std::string & command, Device & device)
 {
     if (auto preampLevel = findValueString (command, "set-preamp-level"); preampLevel.has_value ())
     {
-        const auto level = std::stoi (*preampLevel);
+        const auto level = std::stoi (*preampLevel); //converts string to int
         device.setPreampLevel (level);
+        return true;
+    } else if(auto phantom = findValueString(command, "set-phantom-power"); phantom.has_value()){
+
+        const auto phantomPower = *phantom;
+
+        //checking here if value found is equivalent to on or 1
+        if (phantomPower == "on" || phantomPower == "1") {
+            device.setPhantomPower(true);
+        } else if (phantomPower == "off" || phantomPower == "0") {
+            device.setPhantomPower(false);
+        } else{
+
+            //in case user tries to input kittens!!
+            std::cout << "Phantom can only have values [on/off or 1/0]";
+        }
+
         return true;
     }
 
+    //will notify user of invalid command
     return false;
 }
 
@@ -147,6 +178,8 @@ void runApp ()
     std::cout << "Possible commands\n";
     std::cout << "-----------------\n";
     std::cout << "set-preamp-level  [-127 .. 0]  : set the preamp level (dB) \n";
+    //to dispay to user how to set phantom power
+    std::cout << "set-phantom-power [on/off or 1/0]   :    toggle phantom power on or off \n";
     std::cout << "status                         : view a list of controls and their values \n";
     std::cout << "quit                           : quit Device Control \n\n";
 
@@ -165,7 +198,7 @@ void runApp ()
             std::cout << "Preamp level: " << std::to_string (device.getPreampLevel ()) << std::endl;
 
             //*************line added here to give status of phantom power now as well***********************
-            std::cout << "Phantom Power: " << std::to_string(device.getPhantomPower()) << std::endl;
+            std::cout << "Phantom Power: " << device.getPhantomPower();
         }
         else if (! processDeviceCommand (input, device))
         {
@@ -238,7 +271,7 @@ void testMessageGenerator (Tester & tester)
 
 void testSetPreampLevelCommand (Tester & tester)
 {
-    const std::string command = "set-preamp-level -6";
+    const std::string command = "set-preamp-level -66";
 
     Device device {"testDevice"};
     tester.check (device.getPreampLevel () == Device::MINUS_INFINITY_DB);
