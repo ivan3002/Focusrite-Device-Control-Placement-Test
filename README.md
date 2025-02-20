@@ -1,7 +1,9 @@
 *To Compile*
 - I used gcc version 12.1.0 supporting c++20
-- and ran
-"g++ -std=c++20 -o main main.cpp"
+  then...
+1. Open the terminal and navigate to the project directory.
+2. Compile using the command: `g++ -std=c++20 -o main main.cpp`.
+3. Run the executable
 
 *[1] Problems Identified*
 
