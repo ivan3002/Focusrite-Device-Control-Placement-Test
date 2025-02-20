@@ -42,7 +42,7 @@ public:
 
     void setPreampLevel (int levelDb)
     {
-        //**************adding check to ensure input preamp level is inside range**************************
+        //adding check to ensure input preamp level is inside range
 
         if (levelDb >= MINUS_INFINITY_DB && levelDb <= UNITY_GAIN_DB){
 
@@ -50,6 +50,7 @@ public:
             notifyListeners ("preampLevel", preampLevelDb);
              
         }else{
+            
             std::cout << "Preamp level must be between -127 and 0"; 
             
         }
@@ -61,14 +62,15 @@ public:
         return preampLevelDb;
     }
 
-    //**************getters and setters for Phantom Power******************
+    //getters and setters for Phantom Power
     void setPhantomPower(bool phantomPowerState){
         
        phantomPowerStatus = phantomPowerState;
        notifyListeners ("phantomPower", phantomPowerState ); 
     }
 
-    std::string getPhantomPower(){
+    // for the sake of clarity for the user
+    std::string getPhantomPowerAsString(){
         if (phantomPowerStatus == 1){
             return "on";
         }else {
@@ -177,6 +179,7 @@ void runApp ()
     std::cout << "Possible commands\n";
     std::cout << "-----------------\n";
     std::cout << "set-preamp-level  [-127 .. 0]  : set the preamp level (dB) \n";
+
     //to dispay to user how to set phantom power
     std::cout << "set-phantom-power [on/off or 1/0]   :    toggle phantom power on or off \n";
     std::cout << "status                         : view a list of controls and their values \n";
@@ -196,8 +199,8 @@ void runApp ()
         {
             std::cout << "Preamp level: " << std::to_string (device.getPreampLevel ()) << std::endl;
 
-            //*************line added here to give status of phantom power now as well***********************
-            std::cout << "Phantom Power: " << device.getPhantomPower();
+            //line added here to give status of phantom power now as well
+            std::cout << "Phantom Power: " << device.getPhantomPowerAsString();
         }
         else if (! processDeviceCommand (input, device))
         {
