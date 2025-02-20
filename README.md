@@ -9,7 +9,7 @@
 
 - iostream header not included
 - std::optional not included
-- remove() and remove_if() not members of <ranges> therefore included <algorithm>
+- remove() and remove_if() not members of <ranges> therefore included std::algorithm - ref https://en.cppreference.com/w/cpp/algorithm/ranges/remove
 ![image](https://github.com/user-attachments/assets/12c2a79c-6f56-4122-b799-12c5479f8771)
 
 *[2] Implementing Phantom Power Feature*
