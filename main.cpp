@@ -10,6 +10,7 @@
 
 
 
+
 class Device
 {
 public:
@@ -139,9 +140,18 @@ bool processDeviceCommand (const std::string & command, Device & device)
 {
     if (auto preampLevel = findValueString (command, "set-preamp-level"); preampLevel.has_value ())
     {
-        const auto level = std::stoi (*preampLevel); //converts string to int
-        device.setPreampLevel (level);
-        return true;
+
+        //putting try catch here to ensure program doesn't crash when non-numerical values added
+        try{
+            const auto level = std::stoi (*preampLevel); //converts string to int
+            device.setPreampLevel (level);
+            return true;
+        }catch(std::invalid_argument){
+            std::cout << "Invalid preamp level value\n";
+            return false;
+        }
+        
+       
     } else if(auto phantom = findValueString(command, "set-phantom-power"); phantom.has_value()){
 
         const auto phantomPower = *phantom;
@@ -149,15 +159,16 @@ bool processDeviceCommand (const std::string & command, Device & device)
         //checking here if value found is equivalent to on or 1
         if (phantomPower == "on" || phantomPower == "1") {
             device.setPhantomPower(true);
+            return true;
         } else if (phantomPower == "off" || phantomPower == "0") {
             device.setPhantomPower(false);
+            return true;
         } else{
 
             //in case user tries to input kittens!!
-            std::cout << "Phantom can only have values [on/off or 1/0]";
+            std::cout << "Phantom can only have values [on/off or 1/0]\n";
+            return false;
         }
-
-        return true;
     }
 
     //will notify user of invalid command
