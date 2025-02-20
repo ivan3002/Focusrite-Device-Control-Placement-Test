@@ -43,13 +43,15 @@ public:
     void setPreampLevel (int levelDb)
     {
         //**************adding check to ensure input preamp level is inside range**************************
-        if (levelDb < MINUS_INFINITY_DB || levelDb > UNITY_GAIN_DB){
-            
-            std::cout << "Preamp level must be between -127 and 0";  
-        }else{
-            
+
+        if (levelDb >= MINUS_INFINITY_DB && levelDb <= UNITY_GAIN_DB){
+
             preampLevelDb = levelDb;
             notifyListeners ("preampLevel", preampLevelDb);
+             
+        }else{
+            std::cout << "Preamp level must be between -127 and 0"; 
+            
         }
         
     }
@@ -122,16 +124,13 @@ public:
 std::optional<std::string> findValueString (const std::string & input, const std::string & controlPrefix)
 {
 
-    //added braces here?
-    if (! input.starts_with (controlPrefix)){
+    if (! input.starts_with (controlPrefix))
         return std::nullopt;
-    }else{
-        
-        auto value = input.substr (controlPrefix.length ());
-        value.erase (std::ranges::remove_if(value, isspace).begin (), value.end ());
 
-        return value;
-    }
+    auto value = input.substr (controlPrefix.length ());
+    value.erase (std::ranges::remove_if (value, isspace).begin (), value.end ());
+
+    return value;
 }
 
 bool processDeviceCommand (const std::string & command, Device & device)
@@ -271,7 +270,7 @@ void testMessageGenerator (Tester & tester)
 
 void testSetPreampLevelCommand (Tester & tester)
 {
-    const std::string command = "set-preamp-level -66";
+    const std::string command = "set-preamp-level -6";
 
     Device device {"testDevice"};
     tester.check (device.getPreampLevel () == Device::MINUS_INFINITY_DB);
