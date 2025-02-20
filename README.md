@@ -1,7 +1,7 @@
 *To Compile*
-- I used gcc version 12.1.0
+- I used gcc version 12.1.0 supporting c++20
 - and ran
-g++ -std=c++20 -o main main.cpp
+"g++ -std=c++20 -o main main.cpp"
 
 *[1] Problems Identified*
 
